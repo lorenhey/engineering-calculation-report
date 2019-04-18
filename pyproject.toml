@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "engineering-calculation-report"
+version = "0.1.0"
+description = "A framework for executable, verifiable, and reproducible engineering calculations."
+authors = [
+    {name = "Antigravity"}
+]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "pint",
+    "sympy",
+    "pydantic",
+    "typer",
+    "rich",
+    "jinja2",
+    "pyyaml",
+    "networkx"
+]
+
+[project.scripts]
+ecr = "ecr.cli.main:app"
