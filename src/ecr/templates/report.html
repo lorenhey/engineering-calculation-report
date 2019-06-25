@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculation Report: {{ project.name }}</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; color: #333; }
+        h1, h2, h3 { color: #2c3e50; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f4f6f8; }
+        .equation { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #007bff; }
+        .equation-title { font-weight: bold; margin-bottom: 10px; }
+        .equation-expr { font-family: monospace; font-size: 1.1em; }
+        .result { margin-top: 10px; font-weight: bold; color: #28a745; }
+        .check { padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .check.pass { background-color: #d4edda; border-left: 4px solid #28a745; }
+        .check.fail { background-color: #f8d7da; border-left: 4px solid #dc3545; }
+    </style>
+</head>
+<body>
+
+    <h1>{{ project.name }}</h1>
+
+    <h2>Variables</h2>
+    <table>
+        <tr>
+            <th>Symbol</th>
+            <th>Description</th>
+            <th>Value</th>
+            <th>Unit</th>
+        </tr>
+        {% for var in variables %}
+        <tr>
+            <td><code>{{ var.simbolo }}</code></td>
+            <td>{{ var.descripcion }}</td>
+            <td>
+                {% if var._calculated_value is not none %}
+                    {{ "{:.4g}".format(var._calculated_value.magnitude) }}
+                {% elif var.valor is not none %}
+                    {{ var.valor }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>{{ var.unidad or '' }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Calculations</h2>
+    {% for eq_data in equations %}
+    <div class="equation">
+        <div class="equation-title">{{ eq_data.def.nombre or eq_data.def.id }}</div>
+        <div class="equation-expr">{{ eq_data.def.expresion }}</div>
+        
+        {% if eq_data.target and eq_data.target._calculated_value is not none %}
+        <div class="result">
+            &rarr; {{ eq_data.target.simbolo }} = {{ "{:.4g}".format(eq_data.target._calculated_value.magnitude) }} {{ eq_data.target._calculated_value.units }}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    <h2>Checks</h2>
+    {% for check in checks %}
+    <div class="check {{ 'pass' if check._passed else 'fail' }}">
+        <strong>{{ check.id }}</strong>: {{ check.descripcion }}<br>
+        <code>{{ check.expresion }}</code>
+    </div>
+    {% endfor %}
+
+</body>
+</html>

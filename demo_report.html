@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculation Report: tmppyqugnah</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; color: #333; }
+        h1, h2, h3 { color: #2c3e50; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f4f6f8; }
+        .equation { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #007bff; }
+        .equation-title { font-weight: bold; margin-bottom: 10px; }
+        .equation-expr { font-family: monospace; font-size: 1.1em; }
+        .result { margin-top: 10px; font-weight: bold; color: #28a745; }
+        .check { padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .check.pass { background-color: #d4edda; border-left: 4px solid #28a745; }
+        .check.fail { background-color: #f8d7da; border-left: 4px solid #dc3545; }
+    </style>
+</head>
+<body>
+
+    <h1>tmppyqugnah</h1>
+
+    <h2>Variables</h2>
+    <table>
+        <tr>
+            <th>Symbol</th>
+            <th>Description</th>
+            <th>Value</th>
+            <th>Unit</th>
+        </tr>
+        
+        <tr>
+            <td><code>D</code></td>
+            <td>Diámetro interior</td>
+            <td>
+                
+                    52.5
+                
+            </td>
+            <td>mm</td>
+        </tr>
+        
+        <tr>
+            <td><code>Q</code></td>
+            <td>Caudal</td>
+            <td>
+                
+                    25.0
+                
+            </td>
+            <td>m^3/h</td>
+        </tr>
+        
+        <tr>
+            <td><code>A</code></td>
+            <td>Área de la sección transversal</td>
+            <td>
+                
+                    0.002165
+                
+            </td>
+            <td>m^2</td>
+        </tr>
+        
+        <tr>
+            <td><code>v</code></td>
+            <td>Velocidad del fluido</td>
+            <td>
+                
+                    3.208
+                
+            </td>
+            <td>m/s</td>
+        </tr>
+        
+    </table>
+
+    <h2>Calculations</h2>
+    
+    <div class="equation">
+        <div class="equation-title">Cálculo de Área</div>
+        <div class="equation-expr">A = 3.14159265 * D**2 / 4</div>
+        
+        
+        <div class="result">
+            &rarr; A = 0.002165 meter ** 2
+        </div>
+        
+    </div>
+    
+    <div class="equation">
+        <div class="equation-title">Cálculo de Velocidad</div>
+        <div class="equation-expr">v = Q / A</div>
+        
+        
+        <div class="result">
+            &rarr; v = 3.208 meter / second
+        </div>
+        
+    </div>
+    
+
+    <h2>Checks</h2>
+    
+    <div class="check fail">
+        <strong>vel_max</strong>: Verificación de velocidad máxima<br>
+        <code>v <= 3 m/s</code>
+    </div>
+    
+
+</body>
+</html>
