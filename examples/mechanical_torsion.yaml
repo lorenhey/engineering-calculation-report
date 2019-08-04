@@ -1,0 +1,54 @@
+proyecto: "Cálculo de Eje a Torsión"
+
+variables:
+  P:
+    descripcion: Potencia transmitida
+    valor: 15
+    unidad: kW
+    fuente:
+      tipo: dato_proyecto
+      documento: "Especificación motor M-101"
+  n:
+    descripcion: Velocidad de rotación
+    valor: 1450
+    unidad: rpm
+  d:
+    descripcion: Diámetro del eje
+    valor: 35
+    unidad: mm
+  tau_adm:
+    descripcion: Tensión cortante admisible
+    valor: 60
+    unidad: MPa
+  omega:
+    descripcion: Velocidad angular
+    unidad: rad/s
+  T:
+    descripcion: Momento torsor
+    unidad: N*m
+  J:
+    descripcion: Momento polar de inercia
+    unidad: mm^4
+  tau_max:
+    descripcion: Tensión cortante máxima
+    unidad: MPa
+
+ecuaciones:
+  vel_angular:
+    nombre: "Velocidad Angular"
+    expresion: "omega = 2 * 3.14159265 * n"
+  momento_torsor:
+    nombre: "Momento Torsor"
+    expresion: "T = P / omega"
+  momento_polar:
+    nombre: "Momento Polar de Inercia"
+    expresion: "J = 3.14159265 * d**4 / 32"
+  tension_cortante:
+    nombre: "Tensión Cortante Máxima"
+    expresion: "tau_max = T * (d/2) / J"
+
+verificaciones:
+  check_tension:
+    descripcion: "La tensión máxima debe ser menor a la admisible"
+    expresion: "tau_max <= tau_adm"
+    severidad: error
