@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engineering Calculation Report (ECR) - Memorias de Cálculo Industriales</title>
+  <meta name="description" content="Generador interactivo de memorias de cálculo de ingeniería con verificación dimensional SI, resolución topológica de dependencias en grafo acíclico dirigido (DAG) y formato normalizado Boxmark Leather.">
+
+  <!-- KaTeX for Beautiful Math Typography -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Google Fonts & Font Awesome 6 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Core Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top App Bar -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-logo">
+        <i class="fa-solid fa-compass-drafting"></i>
+        <span>ECR</span>
+      </div>
+      <span class="version-badge">v2.0.0</span>
+      <span class="org-tag">Boxmark Leather Argentina S.A. | Depto. de Ingeniería</span>
+    </div>
+
+    <div class="header-controls">
+      <div class="preset-selector-group">
+        <label for="preset-select"><i class="fa-solid fa-folder-open"></i> Proyecto:</label>
+        <select id="preset-select" class="preset-dropdown">
+          <!-- Populated dynamically via JS -->
+        </select>
+      </div>
+
+      <div id="checks-summary-badge" class="status-pill-badge pill-pass">
+        Calculando...
+      </div>
+
+      <div class="header-actions">
+        <button id="btn-print-report" class="btn-action btn-cyan" title="Imprimir o Exportar PDF oficial">
+          <i class="fa-solid fa-print"></i> Imprimir / PDF
+        </button>
+        <button id="btn-export-yaml" class="btn-action" title="Descargar definición del cálculo en YAML">
+          <i class="fa-solid fa-file-code"></i> YAML
+        </button>
+        <button id="btn-export-latex" class="btn-action" title="Exportar a documento LaTeX">
+          <i class="fa-solid fa-square-root-variable"></i> LaTeX
+        </button>
+        <button id="btn-reset-preset" class="btn-action" title="Restablecer valores originales">
+          <i class="fa-solid fa-rotate-left"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="navigation-bar">
+    <button class="nav-tab-btn active" data-tab="tab-memoria">
+      <i class="fa-solid fa-file-contract"></i> Memoria de Cálculo
+    </button>
+    <button class="nav-tab-btn" data-tab="tab-dag">
+      <i class="fa-solid fa-diagram-project"></i> Grafo de Dependencias (DAG)
+    </button>
+    <button class="nav-tab-btn" data-tab="tab-yaml">
+      <i class="fa-solid fa-code"></i> Editor YAML en Vivo
+    </button>
+    <button class="nav-tab-btn" data-tab="tab-variables">
+      <i class="fa-solid fa-table"></i> Variables & Unidades SI
+    </button>
+    <button class="nav-tab-btn" data-tab="tab-terminal">
+      <i class="fa-solid fa-terminal"></i> Terminal CLI ecr
+    </button>
+    <button class="nav-tab-btn" data-tab="tab-teoria">
+      <i class="fa-solid fa-book-open"></i> Tratado Teórico y Normativo
+    </button>
+  </nav>
+
+  <!-- Main Application Workspace -->
+  <main class="workspace-container">
+    
+    <!-- Left Sidebar: Quick Inputs -->
+    <aside class="sidebar-inputs">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          <i class="fa-solid fa-sliders"></i> Variables de Entrada
+        </div>
+        <div class="sidebar-sub">
+          Modificá los parámetros para recalcular el proyecto al instante.
+        </div>
+      </div>
+      <div class="inputs-list" id="quick-inputs-container">
+        <!-- Input controls dynamically generated -->
+      </div>
+    </aside>
+
+    <!-- Center/Right: Tab Contents -->
+    <div class="tab-content-area">
+
+      <!-- TAB 1: FORMAL CALCULATION MEMORANDUM -->
+      <section id="tab-memoria" class="tab-pane active">
+        <div id="report-view-container">
+          <!-- Rendered dynamically matching Boxmark Leather format -->
+        </div>
+      </section>
+
+      <!-- TAB 2: DAG DEPENDENCY GRAPH -->
+      <section id="tab-dag" class="tab-pane">
+        <div class="dag-view-wrapper">
+          <div class="yaml-toolbar">
+            <span style="font-size: 0.85rem; font-weight: 600; color: #94a3b8;">
+              <i class="fa-solid fa-network-wired"></i> Grafo Acíclico Dirigido (Kahn's Topological Sort)
+            </span>
+            <span style="font-size: 0.75rem; color: #64748b;">
+              Pasá el cursor para resaltar flujos o hacé clic para inspeccionar variables
+            </span>
+          </div>
+          <div id="dag-canvas-container" class="dag-canvas-container">
+            <!-- SVG rendered by DagRenderer -->
+          </div>
+          <div id="dag-node-detail">
+            <!-- Populated on node click -->
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: YAML LIVE EDITOR -->
+      <section id="tab-yaml" class="tab-pane">
+        <div class="yaml-editor-layout">
+          <div class="yaml-toolbar">
+            <span style="font-size: 0.85rem; font-weight: 600; color: #94a3b8;">
+              <i class="fa-solid fa-file-lines"></i> Especificación Declarativa del Proyecto (YAML)
+            </span>
+            <button id="btn-calculate-yaml" class="btn-action btn-cyan">
+              <i class="fa-solid fa-play"></i> Recalcular y Verificar desde YAML
+            </button>
+          </div>
+          <textarea id="yaml-editor-textarea" class="yaml-textarea" spellcheck="false"></textarea>
+        </div>
+      </section>
+
+      <!-- TAB 4: VARIABLES & UNITS TABLE -->
+      <section id="tab-variables" class="tab-pane">
+        <div class="variables-table-container">
+          <table class="tech-table">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Símbolo</th>
+                <th>Descripción Física</th>
+                <th style="text-align: right;">Valor Actual</th>
+                <th>Unidad</th>
+                <th>Dimensión SI [L, M, T, Θ]</th>
+                <th>Fuente / Trazabilidad</th>
+              </tr>
+            </thead>
+            <tbody id="variables-table-body">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 5: CLI TERMINAL EMULATOR -->
+      <section id="tab-terminal" class="tab-pane">
+        <div class="cli-terminal-window">
+          <div class="cli-titlebar">
+            <span class="cli-dot dot-red"></span>
+            <span class="cli-dot dot-yellow"></span>
+            <span class="cli-dot dot-green"></span>
+            <span style="margin-left: 0.5rem;"><i class="fa-solid fa-terminal"></i> ecr interactive console -- boxmark-node-01</span>
+          </div>
+          <div id="cli-output" class="cli-output-area">
+            <!-- Output log -->
+          </div>
+          <div class="cli-input-row">
+            <span class="cli-prompt-symbol">ecr&gt;</span>
+            <input type="text" id="cli-input" class="cli-text-input" placeholder="Escribí un comando ('help', 'demo steam', 'calculate', 'check', 'graph')..." autofocus>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 6: THEORETICAL TREATISE & NORMATIVE BACKGROUND -->
+      <section id="tab-teoria" class="tab-pane">
+        <article class="theory-article">
+          <h1 style="color: #fff; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">
+            Fundamentos de Ingeniería de Cálculo y Verificación Estructural
+          </h1>
+          <p style="color: var(--accent-cyan); font-weight: 600;">
+            Metodología analítica, resolución topológica de dependencias y normas de aplicación en Boxmark Leather Argentina S.A.
+          </p>
+
+          <div class="theory-callout">
+            <strong>Premisa Operativa:</strong> En plantas industriales de proceso continuo como Boxmark, el error humano en planillas de cálculo desvinculadas representa uno de los mayores riesgos operacionales. La formulación declarativa de cálculos desacopla las relaciones matemáticas de su representación visual, garantizando coherencia dimensional estricta en el Sistema Internacional (SI) y trazabilidad normativa auditable.
+          </div>
+
+          <h2>1. Resolución de Dependencias mediante Grafos Acíclicos Dirigidos (DAG)</h2>
+          <p>
+            Toda memoria de cálculo de ingeniería puede modelarse formalmente como un grafo dirigido \(G = (V, E)\), donde los vértices \(V\) representan variables físicas (datos de entrada o magnitudes calculadas) y las aristas dirigidas \(E\) denotan la dependencia funcional impuesta por una ecuación:
+          </p>
+          <p style="text-align: center; font-size: 1.1rem; color: #fff;">
+            $$v_i \xrightarrow{eq_k} v_j \iff v_j = f(\dots, v_i, \dots)$$
+          </p>
+          <p>
+            Para que el cálculo sea resoluble de manera determinista y secuencial, el grafo debe ser <em>acíclico</em> (sin ciclos de retroalimentación implícita que requieran métodos iterativos de punto fijo sin declarar). El motor <code>ECR</code> ejecuta el <strong>Algoritmo de Kahn</strong> para determinar el ordenamiento topológico lineal de cálculo:
+          </p>
+          <ol style="margin-left: 1.5rem; color: #cbd5e1; margin-bottom: 1rem;">
+            <li>Se calculan los grados de entrada (\(inDegree\)) de todos los nodos del proyecto.</li>
+            <li>Se encolan todos los nodos con \(inDegree = 0\) (variables de entrada puras).</li>
+            <li>Se extrae un nodo \(u\) de la cola y se añade al orden de ejecución.</li>
+            <li>Para cada arista saliente \(u \to v\), se decrementa \(inDegree(v)\). Si alcanza 0, \(v\) se agrega a la cola.</li>
+            <li>Si al vaciar la cola el número de nodos ordenados es menor que el total de vértices, el motor aborta la ejecución y reporta de inmediato las variables atrapadas en una <em>dependencia circular</em>.</li>
+          </ol>
+
+          <h2>2. Transmisión Mecánica: Ejes a Torsión Pura (DIN 743 / Tresca)</h2>
+          <p>
+            El momento torsor nominal transmitido por un eje circular macizo accionado por un motor eléctrico de potencia \(P\) y régimen \(n\) se determina mediante la cinemática rotacional:
+          </p>
+          <p style="text-align: center; font-size: 1.1rem; color: #fff;">
+            $$\omega = \frac{2 \pi n}{60} \quad \implies \quad T = \frac{P}{\omega}$$
+          </p>
+          <p>
+            Bajo torsión pura en régimen elástico lineal, la tensión tangencial máxima ocurre en la fibra externa (\(r = d/2\)). El momento polar de inercia para una sección cilíndrica maciza de diámetro \(d\) es:
+          </p>
+          <p style="text-align: center; font-size: 1.1rem; color: #fff;">
+            $$J = \frac{\pi d^4}{32} \quad \implies \quad \tau_{max} = \frac{T \cdot (d/2)}{J} = \frac{16 T}{\pi d^3}$$
+          </p>
+          <p>
+            El criterio de verificación exige que \(\tau_{max} \le \tau_{adm}\), donde \(\tau_{adm} = \tau_{yp} / S_f\) incorpora el coeficiente de seguridad industrial ante sobrecargas y fatiga.
+          </p>
+
+          <h2>3. Cañerías de Vapor Saturado en Planta (ASME B31.1 / Boxmark)</h2>
+          <p>
+            En los procesos de curtido y acondicionamiento térmico de cueros vacunos en Boxmark Leather, el suministro de vapor saturado a los bombos y túneles de secado debe garantizar velocidades de circulación acotadas para prevenir:
+          </p>
+          <ul style="margin-left: 1.5rem; color: #cbd5e1; margin-bottom: 1rem;">
+            <li><strong>Golpes de ariete mecánicos:</strong> Condensación bifásica arrastrada a alta velocidad con riesgo de rotura de codos y válvulas.</li>
+            <li><strong>Erosión acelerada:</strong> Desgaste por impacto de microgotas en las paredes internas de tubos de acero al carbono (ASTM A106 Gr. B).</li>
+            <li><strong>Caídas de presión excesivas:</strong> Pérdida de entalpía y presión útil disponible en los puntos de consumo térmico.</li>
+          </ul>
+          <p>
+            Conforme a la norma ASME B31.1 (Power Piping), la velocidad del vapor saturado debe verificarse estrictamente bajo el límite superior de \(v_{max} = 30\,\text{m/s}\):
+          </p>
+          <p style="text-align: center; font-size: 1.1rem; color: #fff;">
+            $$v = \frac{\dot{m} \cdot v_g}{A} = \frac{4 \cdot Q_{vol}}{\pi d_{int}^2} \le 30\,\text{m/s}$$
+          </p>
+
+          <h2>4. Recipientes a Presión: Envolvente Cilíndrica (ASME Sección VIII Div. 1 UG-27)</h2>
+          <p>
+            Para tanques y reactores cilíndricos sometidos a presión interna de diseño \(P\), la tensión circunferencial (\(\sigma_1\)) predomina sobre la longitudinal (\(\sigma_2 = \sigma_1 / 2\)). La fórmula de pared delgada corregida por la eficiencia de junta soldada (\(E\)) y la tensión admisible del material (\(S\)) establece el espesor mínimo requerido \(t_{req}\):
+          </p>
+          <p style="text-align: center; font-size: 1.1rem; color: #fff;">
+            $$t_{req} = \frac{P \cdot R}{S \cdot E - 0.6 P} + c$$
+          </p>
+          <p>
+            donde \(R\) es el radio interno, \(E\) es la eficiencia de radiografiado de soldadura (típicamente \(E = 0.85\) para radiografía por puntos) y \(c\) representa el sobreespesor de corrosión admisible durante la vida útil de diseño (habitualmente \(c = 1.5\,\text{mm}\) para fluidos levemente corrosivos en acero ASTM A516 Gr. 70). La condición de aceptación verifica que el espesor comercial adoptado \(t_{comercial} \ge t_{req}\).
+          </p>
+
+          <h2>5. Dinámica de Fluidos: Pérdidas de Carga (Darcy-Weisbach / Swamee-Jain)</h2>
+          <p>
+            En circuitos cerrados de recirculación de agua industrial y efluentes, la pérdida de energía por fricción se formula rigurosamente mediante la ecuación universal de Darcy-Weisbach:
+          </p>
+          <p style="text-align: center; font-size: 1.1rem; color: #fff;">
+            $$h_f = f \cdot \frac{L}{D} \cdot \frac{v^2}{2g}$$
+          </p>
+          <p>
+            Para régimen turbulento (\(Re > 4000\)), el factor de fricción \(f\) depende de la rugosidad relativa \(\varepsilon / D\) y del número de Reynolds. La ecuación explícita de Swamee-Jain proporciona una aproximación con error inferior al 1% respecto de la ecuación implícita de Colebrook-White:
+          </p>
+          <p style="text-align: center; font-size: 1.1rem; color: #fff;">
+            $$f = \frac{0.25}{\left[ \log_{10} \left( \frac{\varepsilon / D}{3.7} + \frac{5.74}{Re^{0.9}} \right) \right]^2}$$
+          </p>
+          <p>
+            Con este valor se evalúa la altura manométrica total \(H = H_g + h_f\) y la potencia hidráulica nominal demandada por el grupo de bombeo centrífugo:
+          </p>
+          <p style="text-align: center; font-size: 1.1rem; color: #fff;">
+            $$P_h = \frac{\rho \cdot g \cdot Q \cdot H}{1000} \quad [\text{kW}]$$
+          </p>
+        </article>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/ecr-presets.js"></script>
+  <script src="js/ecr-engine.js"></script>
+  <script src="js/dag-renderer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

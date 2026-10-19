@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "engineering-calculation-report"
-version = "0.1.0"
-description = "A framework for executable, verifiable, and reproducible engineering calculations."
+version = "2.0.0"
+description = "A framework for executable, verifiable, and reproducible engineering calculations with interactive web visualization and formal report generation."
 authors = [
-    {name = "Antigravity"}
+    {name = "Lorenzo Pérez"}
 ]
 readme = "README.md"
 requires-python = ">=3.9"
@@ -24,3 +24,7 @@ dependencies = [
 
 [project.scripts]
 ecr = "ecr.cli.main:app"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
